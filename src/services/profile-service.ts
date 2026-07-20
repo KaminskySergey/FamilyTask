@@ -1,0 +1,88 @@
+import { supabase } from "../lib/supabase";
+import type { IUpdateProfile } from "../types/profile";
+
+
+export async function getProfile(userId: string) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) throw error;
+
+  return data;
+}
+
+type FamilyRole = "OWNER" | "ADMIN" | "MEMBER";
+
+export async function getFamilyRole(
+  familyId: string,
+  userId: string
+): Promise<FamilyRole | null> {
+  const { data, error } = await supabase
+    .from("family_members")
+    .select("role")
+    .eq("family_id", familyId)
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !data) return null;
+  return data.role as FamilyRole;
+}
+
+export async function uploadAvatar(
+  userId: string,
+  fileUri: string
+): Promise<string> {
+  const fileName = `${Date.now()}.jpg`;
+  const filePath = `${userId}/${fileName}`;
+
+  const response = await fetch(fileUri);
+  const arrayBuffer = await response.arrayBuffer();
+
+  if (!arrayBuffer.byteLength) {
+    throw new Error("Empty image buffer (iOS issue)");
+  }
+
+  const { error } = await supabase.storage
+    .from("avatars")
+    .upload(filePath, arrayBuffer, {
+      contentType: "image/jpeg",
+      upsert: true,
+    });
+
+  if (error) throw error;
+
+  const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
+
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({ avatar_url: data.publicUrl })
+    .eq("id", userId);
+
+  if (updateError) throw updateError;
+
+  return data.publicUrl;
+}
+
+
+export async function updateProfile({
+  userId,
+  name,
+  email,
+}: IUpdateProfile) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({
+      name,
+      email,
+    })
+    .eq("id", userId)
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  return data;
+}
