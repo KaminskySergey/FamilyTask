@@ -7,9 +7,16 @@ import { PublicLayout } from './components/layouts/PublicLayout'
 import { PublicRoute } from './routes/PublicRoute'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { AppLayout } from './components/layouts/AppLayout'
-import HomePage from './pages/HomePage'
-import { BrowserRouter } from 'react-router'
 
+import { BrowserRouter } from 'react-router'
+import { AuthLayout } from './components/layouts/AuthLayout'
+
+import { lazy, Suspense } from "react";
+import { Loader } from './components/ui/Loader'
+
+const HomePage = lazy(() => import("./pages/HomePage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 function App() {
 
 
@@ -17,24 +24,32 @@ function App() {
 
     <AppProviders>
       <BrowserRouter>
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route index element={<HomePage />} />
+        <Suspense fallback={<Loader />}>
 
+          <Routes>
+
+            {/* Public + Auth (только для неавторизованных) */}
             <Route element={<PublicRoute />}>
-              {/* <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} /> */}
-            </Route>
-          </Route>
+              <Route element={<PublicLayout />}>
+                <Route index element={<HomePage />} />
+              </Route>
 
-          {/* Private */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              {/* <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/dashboard/profile" element={<ProfilePage />} /> */}
+              <Route element={<AuthLayout />}>
+                <Route path="login" element={<LoginPage />} />
+                <Route path="register" element={<RegisterPage />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
+
+
+            {/* App (только для авторизованных) */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                {/* routes */}
+              </Route>
+            </Route>
+
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </AppProviders>
   )

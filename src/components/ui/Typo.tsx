@@ -1,44 +1,59 @@
-import type { ReactNode, ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { cn } from "../../utils/cn";
 
-type Variant = "h1" | "h2" | "h3" | "body" | "label" | "points";
+const typoVariants = {
+    h1: {
+        tag: "h1",
+        className: "text-h1 font-extrabold leading-tight",
+    },
+    h2: {
+        tag: "h2",
+        className: "text-h2 font-bold leading-tight",
+    },
+    h3: {
+        tag: "h3",
+        className: "text-h3 font-bold",
+    },
+    text: {
+        tag: "p",
+        className: "text-body font-normal leading-relaxed",
+    },
+    label: {
+        tag: "span",
+        className: "text-label font-semibold",
+    },
+} as const;
 
-type TextElements = "h1" | "h2" | "h3" | "p" | "span";
 
-const elementMap: Record<Variant, TextElements> = {
-    h1: "h1",
-    h2: "h2",
-    h3: "h3",
-    body: "p",
-    label: "span",
-    points: "span",
-};
+type Variant = keyof typeof typoVariants;
 
-const variantClasses: Record<Variant, string> = {
-    h1: "text-h1 font-extrabold",
-    h2: "text-h2 font-bold",
-    h3: "text-h3 font-bold",
-    body: "text-body font-normal",
-    label: "text-label font-bold",
-    points: "text-points font-bold",
-};
 
-type Props = ComponentPropsWithoutRef<"span"> & {
+type Props = {
     variant?: Variant;
     className?: string;
     children?: ReactNode;
-};
+} & ComponentPropsWithoutRef<"span">;
+
 
 export function Typo({
-    variant = "body",
+    variant = "text",
     className,
     children,
     ...props
 }: Props) {
-    const Tag = elementMap[variant];
+
+    const { tag: Tag, className: variantClass } = typoVariants[variant];
+
 
     return (
-        <Tag className={cn("text-text", variantClasses[variant], className)} {...props}>
+        <Tag
+            className={cn(
+                "text-text",
+                variantClass,
+                className
+            )}
+            {...props}
+        >
             {children}
         </Tag>
     );

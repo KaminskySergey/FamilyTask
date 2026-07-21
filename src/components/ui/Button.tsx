@@ -17,7 +17,7 @@ export function Button({
   ...props
 }: IButton) {
   const baseStyles =
-    "flex items-center justify-center gap-2 px-6 py-4 rounded-full transition-all duration-200 font-semibold";
+    "flex items-center cursor-pointer justify-center gap-2 px-6 py-4 rounded-full transition-all duration-200 font-semibold";
 
   const variantStyles = {
     primary:

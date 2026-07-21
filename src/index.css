@@ -28,3 +28,24 @@ html,
 body {
     font-family: "Nunito", sans-serif;
 }
+
+@layer components {
+    .text-h1 {
+        @apply text-[32px] font-extrabold leading-tight;
+    }
+    .text-h2 {
+        @apply text-[24px] font-bold leading-tight;
+    }
+    .text-h3 {
+        @apply text-[16px] font-bold;
+    }
+    .text-h4 {
+        @apply text-[20px] font-bold;
+    }
+    .text-body {
+        @apply text-[14px] font-normal;
+    }
+    .text-label {
+        @apply text-[11px] font-semibold;
+    }
+}
