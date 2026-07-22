@@ -28,6 +28,7 @@ export function Button({
 
     danger:
       "bg-danger text-white hover:opacity-90",
+    
   };
 
   return (

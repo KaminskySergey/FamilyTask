@@ -1,5 +1,5 @@
-import { RegisterForm } from "../components/auth/RegisterForm";
-import { Container } from "../components/ui/Container";
+import { RegisterForm } from "../../components/auth/RegisterForm";
+import { Container } from "../../components/ui/Container";
 
 export default function RegisterPage() {
     return (

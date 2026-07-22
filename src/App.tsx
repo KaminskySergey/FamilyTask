@@ -13,10 +13,18 @@ import { AuthLayout } from './components/layouts/AuthLayout'
 
 import { lazy, Suspense } from "react";
 import { Loader } from './components/ui/Loader'
+import { FamilyRoute } from './routes/FamilyRoute'
+import { FamilySetupLayout } from './components/layouts/FamilySetupLayout'
+import { NoFamilyRoute } from './routes/NoFamilyRoute'
 
 const HomePage = lazy(() => import("./pages/HomePage"));
-const LoginPage = lazy(() => import("./pages/LoginPage"));
-const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/auth/RegisterPage"));
+
+const FamilySetupPage = lazy(() => import("./pages/setup/FamilySetupPage"));
+const FamilyCreatePage = lazy(() => import("./pages/setup/FamilyCreatePage"));
+const FamilyJoinPage = lazy(() => import("./pages/setup/FamilyJoinPage"));
+
 function App() {
 
 
@@ -28,7 +36,6 @@ function App() {
 
           <Routes>
 
-            {/* Public + Auth (только для неавторизованных) */}
             <Route element={<PublicRoute />}>
               <Route element={<PublicLayout />}>
                 <Route index element={<HomePage />} />
@@ -41,11 +48,37 @@ function App() {
             </Route>
 
 
-            {/* App (только для авторизованных) */}
             <Route element={<ProtectedRoute />}>
-              <Route element={<AppLayout />}>
-                {/* routes */}
+              <Route element={<NoFamilyRoute />}>
+                <Route element={<FamilySetupLayout />}>
+
+                  <Route
+                    path="/setup"
+                    element={<FamilySetupPage />}
+                  />
+
+                  <Route
+                    path="/create"
+                    element={<FamilyCreatePage />}
+                  />
+
+                  <Route
+                    path="/join"
+                    element={<FamilyJoinPage />}
+                  />
+
+                </Route>
               </Route>
+
+
+              <Route element={<FamilyRoute />}>
+
+                <Route element={<AppLayout />}>
+                  {/* dashboard, tasks... */}
+                </Route>
+
+              </Route>
+
             </Route>
 
           </Routes>
