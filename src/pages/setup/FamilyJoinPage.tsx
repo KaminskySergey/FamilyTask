@@ -113,7 +113,7 @@ export default function FamilyJoinPage() {
                 <div className="rounded-xl border border-primary bg-primary-light p-4">
 
                     <p
-                        className="text-center text-label text-primary"
+                        className="text-center label text-primary"
                     >
                         💡 Ask your family member to send you the invitation code
                     </p>
@@ -127,7 +127,7 @@ export default function FamilyJoinPage() {
                     <div className="rounded-2xl bg-danger-bg p-4">
 
                         <p
-                            className="text-danger text-body"
+                            className="text-danger body"
                         >
                             ⚠ {error}
                         </p>

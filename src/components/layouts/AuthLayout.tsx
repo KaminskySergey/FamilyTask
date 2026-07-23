@@ -16,7 +16,7 @@ export function AuthLayout() {
                 >
                     <ArrowLeft className="transition-transform group-hover:-translate-x-1" />
 
-                    <span className="text-body font-bold">
+                    <span className="body font-bold">
                         Back to Home
                     </span>
                 </Link>

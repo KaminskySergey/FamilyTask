@@ -1,10 +1,22 @@
 import { Outlet } from "react-router";
+import SideBar from "../ui/Sidebar";
 
 export function AppLayout() {
     return (
-        <div>
-            <aside>Сайдбар с навигацией</aside>
-            <main><Outlet /></main>
+        <div className="flex h-screen flex-col">
+            {/* Header */}
+            <header className="h-16 shrink-0 bg-blue text-white flex items-center px-6">
+                Header
+            </header>
+
+            {/* Content */}
+            <div className="flex flex-1">
+                <SideBar />
+
+                <main className="flex-1 bg-background p-8">
+                    <Outlet />
+                </main>
+            </div>
         </div>
     )
 }

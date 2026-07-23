@@ -20,7 +20,7 @@ export function Input({
       {label && (
         <label
           htmlFor={id}
-          className="ml-1 text-body font-medium text-text"
+          className="ml-1 body font-medium text-text"
         >
           {label}
         </label>
@@ -44,7 +44,7 @@ export function Input({
           className={cn(
             "flex-1 bg-transparent outline-none",
             "text-text placeholder:text-light",
-            "font-sans text-body",
+            "font-sans body",
             className,
           )}
           {...props}

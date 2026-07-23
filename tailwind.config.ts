@@ -37,11 +37,12 @@ export default {
         "pink-bg": "#FDF2F8",
 
         gold: "#F59E0B",
+        "gold-light": "#FFE083",
         "gold-bg": "#FFFBEB",
 
         cyan: "#06B6D4",
         "cyan-bg": "#ECFEFF",
-
+        "light-blue": "#E5EEFF",
         blue: "#3B82F6",
         "blue-bg": "#EFF6FF",
 
@@ -49,6 +50,7 @@ export default {
         "streak-bg": "#FFF7ED",
 
         background: "#E9ECF4",
+        "background-white": "#F8FAFC",
         surface: "#FFFFFF",
         card: "#FFFFFF",
 

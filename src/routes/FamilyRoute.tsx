@@ -4,16 +4,21 @@ import { Loader } from "../components/ui/Loader"
 import { useCurrentFamily } from "../hooks/queries/useFamily";
 
 export function FamilyRoute() {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
     const {
         data: familyMember,
-        isLoading
+        isLoading: familyLoading,
     } = useCurrentFamily(user?.id);
 
 
-    if (isLoading) {
+    if (loading || familyLoading) {
         return <Loader />;
+    }
+
+
+    if (!user) {
+        return <Navigate to="/login" replace />;
     }
 
 

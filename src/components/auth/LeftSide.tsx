@@ -15,21 +15,21 @@ export function LeftSide() {
 
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-light text-primary-dark font-semibold text-sm shadow-lg rotate-2 translate-x-0 translate-y-0">
 
-                        <span className="text-h3  text-gold [font-variation-settings:'FILL'_1,'wght'_600]">
+                        <span className="h3  text-gold [font-variation-settings:'FILL'_1,'wght'_600]">
                             star
                         </span>
 
                         Level Up Your Home Life
                     </div>
 
-                    <h2 className="text-h2 font-extrabold text-white">
+                    <h2 className="h2 font-extrabold text-white">
                         Family isn't just a team, it's the{" "}
-                        <span className="text-h2 text-gold">
+                        <span className="h2 text-gold">
                             ultimate quest.
                         </span>
                     </h2>
 
-                    <p className="text-body font-bold leading-relaxed max-w-md mx-auto text-primary-light">
+                    <p className="body font-bold leading-relaxed max-w-md mx-auto text-primary-light">
                         Orchestrate daily tasks, celebrate tiny victories, and turn domestic
                         logistics into a shared adventure everyone wants to play.
                     </p>

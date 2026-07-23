@@ -4,7 +4,7 @@ import { cn } from "../../utils/cn";
 const typoVariants = {
     h1: {
         tag: "h1",
-        className: "text-h1 font-extrabold leading-tight",
+        className: "h1 font-extrabold leading-tight",
     },
     h2: {
         tag: "h2",

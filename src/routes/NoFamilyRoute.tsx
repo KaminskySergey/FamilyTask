@@ -8,7 +8,6 @@ export function NoFamilyRoute() {
     const { user } = useAuth();
 
     const { data: familyMember, isLoading } = useCurrentFamily(user?.id);
-console.log(familyMember)
 
     if (isLoading) {
         return <Loader />;

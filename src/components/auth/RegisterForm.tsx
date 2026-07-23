@@ -89,7 +89,7 @@ export function RegisterForm() {
         />
   
         {generalError && (
-          <p className="text-body text-center text-danger">
+          <p className="body text-center text-danger">
             {generalError}
           </p>
         )}
@@ -115,7 +115,7 @@ export function RegisterForm() {
         </Button>
   
         <div className="text-center">
-          <p className="text-body">
+          <p className="body">
             Already have an account?{" "}
             <Link
               to="/login"

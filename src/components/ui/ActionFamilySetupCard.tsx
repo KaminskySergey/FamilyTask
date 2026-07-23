@@ -44,11 +44,11 @@ export function ActionFamilySetupCard({
             </div>
 
             <div className="flex-1 space-y-1 md:space-y-2 w-full">
-                <h3 className="text-h3 md:text-2xl font-bold leading-tight">
+                <h3 className="h3 md:text-2xl font-bold leading-tight">
                     {label}
                 </h3>
                 <p className={cn(
-                    "text-body text-sm md:text-base max-w-70 md:mx-auto",
+                    "body text-sm md:text-base max-w-70 md:mx-auto",
                     isPrimary ? "text-white/80" : "text-muted"
                 )}>
                     {description}

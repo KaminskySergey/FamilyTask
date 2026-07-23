@@ -25,6 +25,8 @@ const FamilySetupPage = lazy(() => import("./pages/setup/FamilySetupPage"));
 const FamilyCreatePage = lazy(() => import("./pages/setup/FamilyCreatePage"));
 const FamilyJoinPage = lazy(() => import("./pages/setup/FamilyJoinPage"));
 
+const DashboardPage = lazy(() => import("./pages/app/DashboardPage"));
+
 function App() {
 
 
@@ -75,6 +77,7 @@ function App() {
 
                 <Route element={<AppLayout />}>
                   {/* dashboard, tasks... */}
+                  <Route path='/dashboard' element={<DashboardPage />}/>
                 </Route>
 
               </Route>

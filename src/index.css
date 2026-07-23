@@ -30,22 +30,25 @@ body {
 }
 
 @layer components {
-    .text-h1 {
+    .h1-extra {
+        @apply text-[42px] font-extrabold leading-tight;
+    }
+    .h1 {
         @apply text-[32px] font-extrabold leading-tight;
     }
-    .text-h2 {
+    .h2 {
         @apply text-[24px] font-bold leading-tight;
     }
-    .text-h3 {
-        @apply text-[16px] font-bold;
-    }
-    .text-h4 {
+    .h3 {
         @apply text-[20px] font-bold;
     }
-    .text-body {
+    .h4 {
+        @apply text-[16px] font-bold;
+    }
+    .body {
         @apply text-[14px] font-normal;
     }
-    .text-label {
+    .label {
         @apply text-[11px] font-semibold;
     }
 }

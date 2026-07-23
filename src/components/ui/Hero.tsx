@@ -17,7 +17,7 @@ export function Hero({ title, subtitle, icon, className }: IHero) {
                     {icon}
                 </div>
 
-                <h1 className="text-h1 md:text-4xl font-extrabold text-text tracking-tight leading-tight">
+                <h1 className="h1 md:text-4xl font-extrabold text-text tracking-tight leading-tight">
                     {title}
                 </h1>
 

@@ -95,7 +95,7 @@ export default function FamilyCreatePage() {
                 {error && (
                     <div className="rounded-2xl bg-danger-bg p-4">
                         <p
-                            className="text-danger text-body"
+                            className="text-danger body"
                         >
                             {error}
                         </p>

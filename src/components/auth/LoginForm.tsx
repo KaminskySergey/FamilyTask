@@ -77,13 +77,13 @@ export function LoginForm() {
 
             <Link
                 to="/forgot-password"
-                className="self-end text-label font-bold text-primary"
+                className="self-end label font-bold text-primary"
             >
                 Forgot password?
             </Link>
 
             {generalError && (
-                <p className="text-body text-center text-danger">
+                <p className="body text-center text-danger">
                     {generalError}
                 </p>
             )}
@@ -107,7 +107,7 @@ export function LoginForm() {
             </Button>
 
             <div className="text-center">
-                <p className="text-body">
+                <p className="body">
                     Don't have an account?{" "}
                     <Link
                         to="/register"
