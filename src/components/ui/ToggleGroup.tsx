@@ -18,13 +18,13 @@ type ToggleItem = {
     onChange,
   }: ToggleGroupProps) {
     return (
-        <div className="bg-light-blue text-sm text-muted shadow-md rounded-full inline-flex p-1 gap-1">
+        <div className="bg-light-blue  text-muted shadow-md rounded-full inline-flex p-1 gap-1">
           {items.map((item) => (
             <button
               key={item.id}
               onClick={() => onChange?.(item.id)}
               className={cn(
-                "cursor-pointer body font-bold inline-flex items-center px-4 py-2 rounded-full transition-all duration-300 ease-in focus:outline-none",
+                "cursor-pointer h3 font-bold inline-flex items-center px-4 py-2 rounded-full transition-all duration-300 ease-in focus:outline-none",
                 "",
                 {
                   "bg-primary text-white shadow-sm": active === item.id,

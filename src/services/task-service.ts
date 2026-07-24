@@ -1,5 +1,5 @@
-import { format, getDay, getDate } from "date-fns";
-import type { CreateTaskParams, ITask } from "../types/task";
+import { format, getDay, getDate, parseISO } from "date-fns";
+import type { CreateTaskParams, ITask, TaskFilters } from "../types/task";
 import { supabase } from "../lib/supabase";
 
 const PROFILE_SELECT = `
@@ -21,42 +21,138 @@ const TASK_SELECT = `
   creator:profiles!tasks_created_by_fkey (${PROFILE_SELECT})
 `;
 
-export async function getTasks(familyId: string, date: Date): Promise<ITask[]> {
-  const from = format(date, "yyyy-MM-dd") + "T00:00:00";
-  const to = format(date, "yyyy-MM-dd") + "T23:59:59";
-  const dayOfWeek = getDay(date);
-  const dayOfMonth = getDate(date);
+export async function getTasks({
+  familyId,
+  userId,
+  date,
+  owner,
+}: TaskFilters): Promise<ITask[]> {
 
-  const [{ data: onetime, error: e1 }, { data: recurring, error: e2 }] =
-    await Promise.all([
-      supabase
-        .from("tasks")
-        .select(TASK_SELECT)
-        .eq("family_id", familyId)
-        .eq("is_recurring", false)
-        .gte("deadline", from)
-        .lte("deadline", to)
-        .order("deadline", { ascending: true }),
 
-      supabase
-        .from("tasks")
-        .select(TASK_SELECT)
-        .eq("family_id", familyId)
-        .eq("is_recurring", true)
-        .or(
-          `recurrence.eq.daily,` +
-            `and(recurrence.eq.weekly,recurrence_days.cs.{${dayOfWeek}}),` +
-            `and(recurrence.eq.monthly,recurrence_days.cs.{${dayOfMonth}})`
-        )
-        .or(`recurrence_end_date.is.null,recurrence_end_date.gte.${from}`),
-    ]);
+  /**
+   * Обычные задачи
+   */
+  let onetimeQuery = supabase
+      .from("tasks")
+      .select(TASK_SELECT)
+      .eq("family_id", familyId)
+      .eq("is_recurring", false);
 
-  if (e1) throw new Error(e1.message);
-  if (e2) throw new Error(e2.message);
 
-  return [...(onetime ?? []), ...(recurring ?? [])] as unknown as ITask[];
+
+  /**
+   * Повторяющиеся задачи
+   */
+  let recurringQuery = supabase
+      .from("tasks")
+      .select(TASK_SELECT)
+      .eq("family_id", familyId)
+      .eq("is_recurring", true);
+
+
+
+  /**
+   * Только мои задачи
+   */
+  if (owner === "personal" && userId) {
+
+      onetimeQuery = onetimeQuery.eq(
+          "assigned_to",
+          userId
+      );
+
+
+      recurringQuery = recurringQuery.eq(
+          "assigned_to",
+          userId
+      );
+  }
+
+
+
+  /**
+   * Фильтр по дате
+   */
+  if (date) {
+
+      const parsedDate = parseISO(date);
+
+
+      const from = `${date}T00:00:00`;
+
+      const to = `${date}T23:59:59`;
+
+
+      const dayOfWeek = getDay(parsedDate);
+
+      const dayOfMonth = getDate(parsedDate);
+
+
+
+      onetimeQuery = onetimeQuery
+          .gte(
+              "deadline",
+              from
+          )
+          .lte(
+              "deadline",
+              to
+          )
+          .order(
+              "deadline",
+              {
+                  ascending: true,
+              }
+          );
+
+
+
+      recurringQuery = recurringQuery
+          .or(
+              [
+                  "recurrence.eq.daily",
+                  `and(recurrence.eq.weekly,recurrence_days.cs.{${dayOfWeek}})`,
+                  `and(recurrence.eq.monthly,recurrence_days.cs.{${dayOfMonth}})`,
+              ].join(",")
+          )
+          .or(
+              `recurrence_end_date.is.null,recurrence_end_date.gte.${from}`
+          );
+  }
+
+  const [
+      {
+          data: onetime,
+          error: oneTimeError,
+      },
+
+      {
+          data: recurring,
+          error: recurringError,
+      },
+
+  ] = await Promise.all([
+      onetimeQuery,
+      recurringQuery,
+  ]);
+
+  if (oneTimeError) {
+      throw new Error(
+          oneTimeError.message
+      );
+  }
+
+  if (recurringError) {
+      throw new Error(
+          recurringError.message
+      );
+  }
+
+  return [
+      ...(onetime ?? []),
+      ...(recurring ?? []),
+  ] as ITask[];
 }
-
 export async function getMyTodayTasks(userId: string): Promise<ITask[]> {
   const todayStr = format(new Date(), "yyyy-MM-dd");
   const from = `${todayStr}T00:00:00`;

@@ -1,7 +1,6 @@
 import { format } from "date-fns";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
-
 export function useDashboardFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -9,6 +8,7 @@ export function useDashboardFilters() {
   const defaultDate = format(new Date(), "yyyy-MM-dd");
 
   const tab = searchParams.get("tab") ?? defaultTab;
+
   const date = searchParams.get("date") ?? defaultDate;
 
   useEffect(() => {
@@ -16,39 +16,39 @@ export function useDashboardFilters() {
 
     let changed = false;
 
-    if (!params.get("tab")) {
+    if (!params.has("tab")) {
       params.set("tab", defaultTab);
       changed = true;
     }
 
-    if (!params.get("date")) {
+    if (!params.has("date")) {
       params.set("date", defaultDate);
       changed = true;
     }
 
     if (changed) {
-      setSearchParams(params, { replace: true });
+      setSearchParams(params, {
+        replace: true,
+      });
     }
   }, []);
 
-  function setTab(tab: string) {
-    const params = new URLSearchParams(searchParams);
-    params.set("tab", tab);
+  const updateParam = (key: string, value: string) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
 
-    setSearchParams(params);
-  }
+      params.set(key, value);
 
-  function setDate(date: string) {
-    const params = new URLSearchParams(searchParams);
-    params.set("date", date);
-
-    setSearchParams(params);
-  }
+      return params;
+    });
+  };
 
   return {
     tab,
     date,
-    setTab,
-    setDate,
+
+    setTab: (tab: string) => updateParam("tab", tab),
+
+    setDate: (date: string) => updateParam("date", date),
   };
 }

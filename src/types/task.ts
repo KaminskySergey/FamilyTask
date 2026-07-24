@@ -2,7 +2,14 @@ import type { IProfile } from "./profile";
 
 export type TaskStatus = "PENDING" | "IN_PROGRESS" | "DONE";
 export type TaskRecurrence = "daily" | "weekly" | "monthly";
-export type TaskCategory = "cleaning" | "cooking" | "shopping" | "education" | "health" | "finance" | "other";
+export type TaskCategory =
+  | "cleaning"
+  | "cooking"
+  | "shopping"
+  | "education"
+  | "health"
+  | "finance"
+  | "other";
 export type TaskPriority = "low" | "normal" | "high";
 
 export interface ITaskCompletion {
@@ -52,16 +59,22 @@ export type CreateTaskParams = {
   recurrence_end_date?: string | null;
 };
 
-  export interface ISegmentTabs {
-    key: string;
-    label: string;
-  };
-  
+export interface ISegmentTabs {
+  key: string;
+  label: string;
+}
 
+export interface ITaskFilters {
+  recurrence: TaskRecurrence | null;
+  priority: TaskPriority | null;
+  categories: TaskCategory[];
+}
 
-  export interface ITaskFilters {
-    recurrence: TaskRecurrence | null;
-    priority: TaskPriority | null;
-    categories: TaskCategory[];
-  }
-  
+export type TaskOwnerFilter = "personal" | "family";
+
+export type TaskFilters = {
+  familyId?: string;
+  userId?: string;
+  date?: string;
+  owner?: TaskOwnerFilter;
+};

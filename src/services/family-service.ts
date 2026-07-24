@@ -147,7 +147,7 @@ export async function getCurrentFamily(userId: string): Promise<CurrentFamily> {
     return null;
   }
 
-  return data as CurrentFamily;
+  return data as unknown as CurrentFamily;
 }
 
 export async function getFamilyMembers(

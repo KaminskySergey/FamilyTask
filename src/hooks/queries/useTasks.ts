@@ -10,14 +10,21 @@ import {
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { format } from "date-fns";
-import type { CreateTaskParams } from "../../types/task";
+import type { CreateTaskParams, TaskFilters } from "../../types/task";
 
-export function useTasks(familyId?: string, date?: Date) {
+export function useTasks(filters: TaskFilters) {
   return useQuery({
-    queryKey: ["tasks", familyId, date ? format(date, "yyyy-MM-dd") : null],
-    queryFn: () => getTasks(familyId!, date!),
-    enabled: !!familyId && !!date,
+    queryKey: [
+      "tasks",
+      filters.familyId,
+      filters.userId,
+      filters.date,
+      filters.owner,
+    ],
+
+    queryFn: () => getTasks(filters),
+
+    enabled: !!filters.familyId,
   });
 }
 
@@ -58,8 +65,12 @@ export function useCompleteTask() {
     }) => completeTask(taskId, userId, xpEarned, recurringDate),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["leaderboard", variables.familyId] });
-      queryClient.invalidateQueries({ queryKey: ["profile", variables.userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["leaderboard", variables.familyId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["profile", variables.userId],
+      });
     },
   });
 }
@@ -79,8 +90,12 @@ export function useUncompleteTask() {
     }) => uncompleteTask(taskId, userId, recurringDate),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["leaderboard", variables.familyId] });
-      queryClient.invalidateQueries({ queryKey: ["profile", variables.userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["leaderboard", variables.familyId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["profile", variables.userId],
+      });
     },
   });
 }
@@ -92,7 +107,6 @@ export function useDeleteTask() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   });
 }
-
 
 export function useCompletedTasksCount(userId: string) {
   return useQuery({
