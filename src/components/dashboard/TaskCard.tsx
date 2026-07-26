@@ -46,7 +46,6 @@ export function TaskCard({
         ) ?? false
         : task.status === "DONE";
 
-    console.log(isDone)
     const toggleDone = () => {
 
         if (isPending || !user) return;
@@ -162,7 +161,7 @@ export function TaskCard({
             <div className="flex items-center gap-3 justify-between sm:justify-end shrink-0 pt-2 sm:pt-0 border-t sm:border-none border-border pr-2">
                 {task.deadline && (
                     <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-light-blue  text-text font-medium">
-                        <span className="opacity-60">до</span>
+                        <span className="opacity-60">by</span>
                         <span>{format(new Date(task.deadline), "HH:mm")}</span>
                     </div>
                 )}

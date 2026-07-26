@@ -76,5 +76,4 @@ export type TaskFilters = {
   familyId?: string;
   userId?: string;
   date?: string;
-  owner?: TaskOwnerFilter;
 };

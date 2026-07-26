@@ -1,13 +1,14 @@
 import { format } from "date-fns";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
+import type { DashboardTab } from "../types/tab";
 export function useDashboardFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const defaultTab = "personal";
+  const defaultTab: DashboardTab = "personal";
   const defaultDate = format(new Date(), "yyyy-MM-dd");
 
-  const tab = searchParams.get("tab") ?? defaultTab;
+  const tab = (searchParams.get("tab") ?? defaultTab) as DashboardTab;
 
   const date = searchParams.get("date") ?? defaultDate;
 

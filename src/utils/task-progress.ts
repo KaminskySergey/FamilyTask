@@ -1,26 +1,31 @@
 import type { ITask } from "../types/task";
 
-export function getTaskProgress(
-    tasks: ITask[],
-    userId: string,
-    date: string
+export function getUserTaskProgress(
+  tasks: ITask[],
+  userId: string,
+  date: string
 ) {
-    const completed = tasks.filter(task => {
+  const relevantTasks = tasks.filter((task) => task.assigned_to === userId);
 
-        if (task.is_recurring) {
-            return task.completions?.some(
-                c =>
-                    c.user_id === userId &&
-                    c.recurring_date === date
-            );
-        }
+  const completed = relevantTasks.filter((task) => {
+    if (task.is_recurring) {
+      return task.completions?.some(
+        (c) => c.recurring_date === date && c.user_id === userId
+      );
+    }
+    return task.status === "DONE";
+  }).length;
 
-        return task.status === "DONE";
-    }).length;
+  return { completed, total: relevantTasks.length };
+}
 
+export function getFamilyTaskProgress(tasks: ITask[], date: string) {
+  const completed = tasks.filter((task) => {
+    if (task.is_recurring) {
+      return task.completions?.some((c) => c.recurring_date === date);
+    }
+    return task.status === "DONE";
+  }).length;
 
-    return {
-        completed,
-        total: tasks.length,
-    };
+  return { completed, total: tasks.length };
 }

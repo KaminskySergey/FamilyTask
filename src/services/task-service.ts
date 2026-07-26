@@ -25,134 +25,68 @@ export async function getTasks({
   familyId,
   userId,
   date,
-  owner,
 }: TaskFilters): Promise<ITask[]> {
-
-
-  /**
-   * Обычные задачи
-   */
   let onetimeQuery = supabase
-      .from("tasks")
-      .select(TASK_SELECT)
-      .eq("family_id", familyId)
-      .eq("is_recurring", false);
+    .from("tasks")
+    .select(TASK_SELECT)
+    .eq("family_id", familyId)
+    .eq("is_recurring", false);
 
-
-
-  /**
-   * Повторяющиеся задачи
-   */
   let recurringQuery = supabase
-      .from("tasks")
-      .select(TASK_SELECT)
-      .eq("family_id", familyId)
-      .eq("is_recurring", true);
+    .from("tasks")
+    .select(TASK_SELECT)
+    .eq("family_id", familyId)
+    .eq("is_recurring", true);
 
+  if (userId) {
+    onetimeQuery = onetimeQuery.eq("assigned_to", userId);
 
-
-  /**
-   * Только мои задачи
-   */
-  if (owner === "personal" && userId) {
-
-      onetimeQuery = onetimeQuery.eq(
-          "assigned_to",
-          userId
-      );
-
-
-      recurringQuery = recurringQuery.eq(
-          "assigned_to",
-          userId
-      );
+    recurringQuery = recurringQuery.eq("assigned_to", userId);
   }
 
-
-
-  /**
-   * Фильтр по дате
-   */
   if (date) {
+    const parsedDate = parseISO(date);
 
-      const parsedDate = parseISO(date);
+    const from = `${date}T00:00:00`;
+    const to = `${date}T23:59:59`;
 
+    const dayOfWeek = getDay(parsedDate);
+    const dayOfMonth = getDate(parsedDate);
 
-      const from = `${date}T00:00:00`;
+    onetimeQuery = onetimeQuery
+      .gte("deadline", from)
+      .lte("deadline", to)
+      .order("deadline", {
+        ascending: true,
+      });
 
-      const to = `${date}T23:59:59`;
-
-
-      const dayOfWeek = getDay(parsedDate);
-
-      const dayOfMonth = getDate(parsedDate);
-
-
-
-      onetimeQuery = onetimeQuery
-          .gte(
-              "deadline",
-              from
-          )
-          .lte(
-              "deadline",
-              to
-          )
-          .order(
-              "deadline",
-              {
-                  ascending: true,
-              }
-          );
-
-
-
-      recurringQuery = recurringQuery
-          .or(
-              [
-                  "recurrence.eq.daily",
-                  `and(recurrence.eq.weekly,recurrence_days.cs.{${dayOfWeek}})`,
-                  `and(recurrence.eq.monthly,recurrence_days.cs.{${dayOfMonth}})`,
-              ].join(",")
-          )
-          .or(
-              `recurrence_end_date.is.null,recurrence_end_date.gte.${from}`
-          );
+    recurringQuery = recurringQuery
+      .or(
+        [
+          "recurrence.eq.daily",
+          `and(recurrence.eq.weekly,recurrence_days.cs.{${dayOfWeek}})`,
+          `and(recurrence.eq.monthly,recurrence_days.cs.{${dayOfMonth}})`,
+        ].join(",")
+      )
+      .or(`recurrence_end_date.is.null,recurrence_end_date.gte.${from}`);
   }
 
   const [
-      {
-          data: onetime,
-          error: oneTimeError,
-      },
-
-      {
-          data: recurring,
-          error: recurringError,
-      },
-
-  ] = await Promise.all([
-      onetimeQuery,
-      recurringQuery,
-  ]);
+    { data: onetime, error: oneTimeError },
+    { data: recurring, error: recurringError },
+  ] = await Promise.all([onetimeQuery, recurringQuery]);
 
   if (oneTimeError) {
-      throw new Error(
-          oneTimeError.message
-      );
+    throw new Error(oneTimeError.message);
   }
 
   if (recurringError) {
-      throw new Error(
-          recurringError.message
-      );
+    throw new Error(recurringError.message);
   }
 
-  return [
-      ...(onetime ?? []),
-      ...(recurring ?? []),
-  ] as ITask[];
+  return [...(onetime ?? []), ...(recurring ?? [])] as ITask[];
 }
+
 export async function getMyTodayTasks(userId: string): Promise<ITask[]> {
   const todayStr = format(new Date(), "yyyy-MM-dd");
   const from = `${todayStr}T00:00:00`;

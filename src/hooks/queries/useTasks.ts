@@ -19,7 +19,6 @@ export function useTasks(filters: TaskFilters) {
       filters.familyId,
       filters.userId,
       filters.date,
-      filters.owner,
     ],
 
     queryFn: () => getTasks(filters),

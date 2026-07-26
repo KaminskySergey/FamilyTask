@@ -1,3 +1,5 @@
+import { Box } from "./Box";
+
 type TaskProgressProps = {
     mode: "personal" | "family"
     completed: number;
@@ -20,7 +22,7 @@ export function TaskProgress({
         ? "My Plan"
         : "Family Plan";
     return (
-        <>
+        <Box>
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-h1 font-bold text-text">
                     {title}
@@ -47,6 +49,6 @@ export function TaskProgress({
                 {completed} of {total} tasks completed
             </p>
 
-        </>
+        </Box>
     );
 }
