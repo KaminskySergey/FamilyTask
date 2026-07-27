@@ -1,5 +1,6 @@
 import { Outlet } from "react-router";
 import SideBar from "../ui/Sidebar";
+import { BottomNavigation } from "../ui/BottomNavigation";
 
 export function AppLayout() {
     return (
@@ -12,8 +13,8 @@ export function AppLayout() {
             {/* Content */}
             <div className="flex flex-1">
                 <SideBar />
-
-                <main className="flex-1 bg-background p-8">
+                <BottomNavigation />
+                <main className="flex-1 bg-background p-4 pb-24 xl:p-8">
                     <Outlet />
                 </main>
             </div>

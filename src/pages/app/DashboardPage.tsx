@@ -16,11 +16,14 @@ import { Loader } from "../../components/ui/Loader";
 import FamilyProgress from "../../components/dashboard/FamilyProgress";
 import { useMemo } from "react";
 import { DashboardHeader } from "../../components/dashboard/DashboardHeader";
+import ToggleGroup from "../../components/ui/ToggleGroup";
+import { taskTabs } from "../../constants/tabsTasks";
 
 export default function DashboardPage() {
     const { user } = useAuth();
 
-    const { tab, date, setDate } = useDashboardFilters();
+    const { tab, date, setDate, setTab } = useDashboardFilters();
+
     const { data: family, isLoading: familyLoading } = useCurrentFamily(user?.id);
     const { data: tasks, isLoading: isTasksLoading } = useTasks({ familyId: family?.family_id, date });
 
@@ -55,19 +58,40 @@ export default function DashboardPage() {
     );
     return (
         <Container className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <section className="lg:col-span-12 rounded-xl p-4 ">
+
+            {/* Header */}
+            <section className="lg:col-span-12 rounded-xl p-4">
                 <DashboardHeader />
             </section>
-            {/* Left */}
+
+
+            {/* Left content */}
             <section className="lg:col-span-8 space-y-6">
 
-                {isTasksLoading ? <LevelCardSkeleton /> :
-                        <TaskProgress
-                            mode={mode}
-                            completed={taskProgress.completed}
-                            total={taskProgress.total}
-                        />
-                }
+                <div className="lg:hidden ">
+                    <SmallCalendar
+                        date={date}
+                        setDate={setDate}
+                    />
+                </div>
+
+                <div className="lg:hidden">
+                    <ToggleGroup
+                        active={tab}
+                        onChange={setTab}
+                        items={taskTabs}
+                    />
+                </div>
+
+                {isTasksLoading ? (
+                    <LevelCardSkeleton />
+                ) : (
+                    <TaskProgress
+                        mode={mode}
+                        completed={taskProgress.completed}
+                        total={taskProgress.total}
+                    />
+                )}
 
                 {isTasksLoading ? (
                     <TasksSkeleton />
@@ -77,10 +101,21 @@ export default function DashboardPage() {
                         items={visibleTasks}
                     />
                 )}
+
+                {/* Mobile only */}
+                <div className="lg:hidden">
+                    <FamilyProgress
+                        familyId={family.family_id}
+                        tasks={tasks ?? []}
+                        date={date}
+                    />
+                </div>
+
             </section>
 
-            {/* Right */}
-            <aside className="lg:col-span-4 space-y-6 lg:flex lg:flex-col lg:items-start lg:max-w-sm">
+
+            {/* Sidebar */}
+            <aside className="hidden lg:flex lg:col-span-4 flex-col gap-6">
 
                 <SmallCalendar
                     date={date}
@@ -92,6 +127,7 @@ export default function DashboardPage() {
                     tasks={tasks ?? []}
                     date={date}
                 />
+
             </aside>
 
         </Container>

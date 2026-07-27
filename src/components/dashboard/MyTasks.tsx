@@ -15,7 +15,7 @@ export function MyTasks({ items, date }: IMyTasks) {
             {items.length !== 0 ? <ul className="flex flex-col gap-3">
                 {
                     items.map((el) => (
-                        <TaskCard selectedDate={date} task={el} />
+                        <TaskCard key={el.id} selectedDate={date} task={el} />
                     ))
                 }
             </ul>

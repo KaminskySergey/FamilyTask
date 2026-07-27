@@ -6,11 +6,16 @@ import { taskTabs } from "../../constants/tabsTasks";
 
 export function DashboardHeader() {
     const { tab, date, setTab } = useDashboardFilters();
-    
-    return (
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-            <ToggleGroup active={tab} onChange={setTab} items={taskTabs} />
+    return (
+        <div className="flex flex-col w-full md:flex-row md:items-center md:justify-between gap-4">
+            <div className="hidden lg:block">
+                <ToggleGroup
+                    active={tab}
+                    onChange={setTab}
+                    items={taskTabs}
+                />
+            </div>
 
             <div className="flex items-center gap-3 md:text-right">
                 <div>
