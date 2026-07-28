@@ -1,10 +1,18 @@
+import { cn } from "@/utils/cn";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import type { ReactNode } from "react";
+
+interface FilterOption {
+  key: string;
+  label: string;
+  color?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+}
 
 interface FilterSelectProps<T extends string> {
   icon?: ReactNode;
   placeholder: string;
-  options: readonly T[];
+  options: readonly FilterOption[];
   value?: T;
   onChange: (value: T) => void;
 }
@@ -28,11 +36,14 @@ export function FilterSelect<T extends string>({
         <div className="p-2">
           {options.map((option) => (
             <SelectItem
-              key={option}
-              value={option}
-              className="inline-flex h4 items-center w-full p-4 rounded-2xl cursor-pointer hover:bg-light-blue hover:text-text focus:bg-primary/10 focus:text-primary"
+              key={option.key}
+              value={option.key}
+              className="inline-flex h4  items-center w-full p-4 rounded-2xl cursor-pointer hover:bg-light-blue hover:text-text focus:bg-primary/10 focus:text-primary"
             >
-              {option}
+              {option.icon && (
+                <option.icon className={cn("w-4 h-4", option.color ?? "text-primary")} />
+              )}
+              {option.label}
             </SelectItem>
           ))}
         </div>
@@ -40,3 +51,6 @@ export function FilterSelect<T extends string>({
     </Select>
   );
 }
+
+
+

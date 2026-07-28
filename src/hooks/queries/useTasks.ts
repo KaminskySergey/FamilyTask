@@ -14,18 +14,12 @@ import type { CreateTaskParams, TaskFilters } from "../../types/task";
 
 export function useTasks(filters: TaskFilters) {
   return useQuery({
-    queryKey: [
-      "tasks",
-      filters.familyId,
-      filters.userId,
-      filters.date,
-    ],
-
+    queryKey: ["tasks", filters],
     queryFn: () => getTasks(filters),
-
     enabled: !!filters.familyId,
   });
 }
+
 
 export function useMyTodayTasks(userId?: string) {
   return useQuery({

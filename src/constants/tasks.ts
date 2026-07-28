@@ -6,6 +6,7 @@ import {
   Wallet,
   Utensils,
   Folder,
+  Circle,
 } from "lucide-react";
 
 export const TASK_CATEGORIES = [
@@ -52,4 +53,23 @@ export const RECURRENCE_OPTIONS = [
   { key: "monthly", label: "Monthly" },
 ] as const;
 
-
+export const TASK_PRIORITIES = [
+  {
+    key: "low",
+    label: "Low",
+    icon: Circle,
+    color: "fill-success text-success",
+  },
+  {
+    key: "normal",
+    label: "Normal",
+    icon: Circle,
+    color: "fill-warning text-warning",
+  },
+  {
+    key: "high",
+    label: "High",
+    icon: Circle,
+    color: "fill-danger text-danger",
+  },
+] as const;

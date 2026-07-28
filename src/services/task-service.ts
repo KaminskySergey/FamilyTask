@@ -25,7 +25,15 @@ export async function getTasks({
   familyId,
   userId,
   date,
+  tab,
+  priority,
+  category,
+  recurrence,
+  search,
 }: TaskFilters): Promise<ITask[]> {
+  const skipOnetime = !!recurrence;
+  console.log("skipOnetime =", skipOnetime);
+
   let onetimeQuery = supabase
     .from("tasks")
     .select(TASK_SELECT)
@@ -40,41 +48,76 @@ export async function getTasks({
 
   if (userId) {
     onetimeQuery = onetimeQuery.eq("assigned_to", userId);
-
     recurringQuery = recurringQuery.eq("assigned_to", userId);
+  }
+
+  if (priority) {
+    onetimeQuery = onetimeQuery.eq("priority", priority);
+    recurringQuery = recurringQuery.eq("priority", priority);
+  }
+
+  if (category) {
+    onetimeQuery = onetimeQuery.eq("category", category);
+    recurringQuery = recurringQuery.eq("category", category);
+  }
+
+  if (recurrence) {
+    recurringQuery = recurringQuery.eq("recurrence", recurrence);
+  }
+
+  if (search) {
+    onetimeQuery = onetimeQuery.ilike("title", `%${search}%`);
+    recurringQuery = recurringQuery.ilike("title", `%${search}%`);
+  }
+
+  if (tab === "completed") {
+    onetimeQuery = onetimeQuery.eq("status", "DONE");
+    recurringQuery = recurringQuery.eq("status", "DONE");
+  }
+
+  if (tab === "open") {
+    onetimeQuery = onetimeQuery.neq("status", "DONE");
+    recurringQuery = recurringQuery.neq("status", "DONE");
   }
 
   if (date) {
     const parsedDate = parseISO(date);
-
     const from = `${date}T00:00:00`;
     const to = `${date}T23:59:59`;
 
     const dayOfWeek = getDay(parsedDate);
     const dayOfMonth = getDate(parsedDate);
 
-    onetimeQuery = onetimeQuery
-      .gte("deadline", from)
-      .lte("deadline", to)
-      .order("deadline", {
-        ascending: true,
-      });
+    onetimeQuery = onetimeQuery.gte("deadline", from).lte("deadline", to);
 
-    recurringQuery = recurringQuery
-      .or(
+    if (!recurrence) {
+      recurringQuery = recurringQuery.or(
         [
           "recurrence.eq.daily",
           `and(recurrence.eq.weekly,recurrence_days.cs.{${dayOfWeek}})`,
           `and(recurrence.eq.monthly,recurrence_days.cs.{${dayOfMonth}})`,
         ].join(",")
-      )
-      .or(`recurrence_end_date.is.null,recurrence_end_date.gte.${from}`);
+      );
+    } else if (recurrence === "weekly") {
+      recurringQuery = recurringQuery.contains("recurrence_days", [dayOfWeek]);
+    } else if (recurrence === "monthly") {
+      recurringQuery = recurringQuery.contains("recurrence_days", [dayOfMonth]);
+    }
+
+    recurringQuery = recurringQuery.or(
+      `recurrence_end_date.is.null,recurrence_end_date.gte.${from}`
+    );
   }
 
   const [
     { data: onetime, error: oneTimeError },
     { data: recurring, error: recurringError },
-  ] = await Promise.all([onetimeQuery, recurringQuery]);
+  ] = await Promise.all([
+    skipOnetime
+      ? Promise.resolve({ data: [] as ITask[], error: null })
+      : onetimeQuery,
+    recurringQuery,
+  ]);
 
   if (oneTimeError) {
     throw new Error(oneTimeError.message);

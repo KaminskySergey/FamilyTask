@@ -16,7 +16,6 @@ import { Loader } from './components/ui/Loader'
 import { FamilyRoute } from './routes/FamilyRoute'
 import { FamilySetupLayout } from './components/layouts/FamilySetupLayout'
 import { NoFamilyRoute } from './routes/NoFamilyRoute'
-import { TasksPage } from './pages/app/TasksPage'
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
@@ -27,6 +26,7 @@ const FamilyCreatePage = lazy(() => import("./pages/setup/FamilyCreatePage"));
 const FamilyJoinPage = lazy(() => import("./pages/setup/FamilyJoinPage"));
 
 const DashboardPage = lazy(() => import("./pages/app/DashboardPage"));
+const TasksPage = lazy(() => import("./pages/app/TasksPage"));
 
 function App() {
 

@@ -76,4 +76,10 @@ export type TaskFilters = {
   familyId?: string;
   userId?: string;
   date?: string;
+  tab?: "open" | "completed" | "all";
+  priority?: string;
+  category?: string;
+  recurrence?: string;
+  search?: string;
+  page?: number;
 };

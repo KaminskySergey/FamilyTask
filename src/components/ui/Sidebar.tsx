@@ -2,11 +2,11 @@ import { ListTodo, CalendarCheck2, Settings, ChevronRight, LayoutDashboard, Chev
 import { useSidebarContext } from '../../contexts/SibebarContext';
 import { cn } from '../../utils/cn';
 import ItemNav from './ItemNav';
-import { useDashboardFilters } from '../../hooks/useDashboardFilters';
+import { getTodayDate } from '@/utils/date';
 
 export default function SideBar() {
     const { isSidebarOpen, openSidebar, closeSidebar } = useSidebarContext()
-    const { date } = useDashboardFilters()
+    const today = getTodayDate();
 
     return (
         <aside className={cn("bg-white relative dark:bg-[#101828] dark:shadow-[6px_6px_12px_#0a0a0a,-6px_-6px_12px_#1f2937] hidden  shadow-md rounded-br-2xl  xl:flex flex-col justify-between  text-black dark:text-white h-full transition-width duration-300 ease-in-out px-4 pb-6 pt-3", {
@@ -29,9 +29,9 @@ export default function SideBar() {
                 <nav>
                     <ul className='flex flex-col gap-2'>
 
-                        <ItemNav href={`/dashboard`} link="Dashboard" icon={<LayoutDashboard />} />
-                        <ItemNav href={`/calendar/${date}`} link="Calendar" icon={<CalendarCheck2 />} />
-                        <ItemNav href="/tasks" link="Tasks" icon={<ListTodo />} />
+                        <ItemNav href={`/dashboard?tab=personal&date=${today}`} link="Dashboard" icon={<LayoutDashboard />} />
+                        <ItemNav href={`/calendar/${today}`} link="Calendar" icon={<CalendarCheck2 />} />
+                        <ItemNav href={`/tasks?tab=open`} link="Tasks" icon={<ListTodo />} />
                         <ItemNav href="/family" link="Family" icon={<Users />} />
                         {/* <ItemNav href="/progress" link="Progress" icon={<ChartNoAxesCombined />} /> */}
                         <ItemNav href="/settings" link="Settings" icon={<Settings />} />
