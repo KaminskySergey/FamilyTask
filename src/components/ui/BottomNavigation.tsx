@@ -6,7 +6,7 @@ export function BottomNavigation() {
     const { date } = useDashboardFilters();
 
     return (
-        <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex gap-1 w-[calc(100%-2rem)] max-w-md rounded-full border border-white/30 bg-white/80 p-2 shadow-xl backdrop-blur-xl xl:hidden">
+        <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex gap-1 max-w-md rounded-full border border-white/30 bg-white/80 p-2 shadow-xl backdrop-blur-xl xl:hidden">
             <ItemTab
                 href="/dashboard"
                 label="Dashboard"

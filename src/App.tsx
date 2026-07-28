@@ -16,6 +16,7 @@ import { Loader } from './components/ui/Loader'
 import { FamilyRoute } from './routes/FamilyRoute'
 import { FamilySetupLayout } from './components/layouts/FamilySetupLayout'
 import { NoFamilyRoute } from './routes/NoFamilyRoute'
+import { TasksPage } from './pages/app/TasksPage'
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
@@ -78,6 +79,7 @@ function App() {
                 <Route element={<AppLayout />}>
                   {/* dashboard, tasks... */}
                   <Route path='/dashboard' element={<DashboardPage />}/>
+                  <Route path='/tasks' element={<TasksPage />}/>
                 </Route>
 
               </Route>
