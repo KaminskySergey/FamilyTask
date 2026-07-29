@@ -1,4 +1,3 @@
-import { NavLink, useSearchParams } from "react-router";
 import { cn } from "../../utils/cn";
 import { useTaskFilters } from "@/hooks/useTaskFilters";
 

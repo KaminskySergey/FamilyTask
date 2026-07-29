@@ -9,6 +9,16 @@ import {
   Circle,
 } from "lucide-react";
 
+export const WEEKDAY_LABELS: Record<number, string> = {
+  0: "Sun",
+  1: "Mon",
+  2: "Tue",
+  3: "Wed",
+  4: "Thu",
+  5: "Fri",
+  6: "Sat",
+};
+
 export const TASK_CATEGORIES = [
   {
     key: "cleaning",
@@ -51,7 +61,9 @@ export const RECURRENCE_OPTIONS = [
   { key: "daily", label: "Daily" },
   { key: "weekly", label: "Weekly" },
   { key: "monthly", label: "Monthly" },
+  { key: "none", label: "One-time" },
 ] as const;
+
 
 export const TASK_PRIORITIES = [
   {
@@ -73,3 +85,34 @@ export const TASK_PRIORITIES = [
     color: "fill-danger text-danger",
   },
 ] as const;
+
+export const TASK_CATEGORIES_FOR_TABLE = {
+  cleaning: {
+    label: "Cleaning",
+    icon: BrushCleaning,
+  },
+  cooking: {
+    label: "Cooking",
+    icon: Utensils,
+  },
+  shopping: {
+    label: "Shopping",
+    icon: ShoppingCart,
+  },
+  education: {
+    label: "Education",
+    icon: GraduationCap,
+  },
+  health: {
+    label: "Health",
+    icon: Heart,
+  },
+  finance: {
+    label: "Finance",
+    icon: Wallet,
+  },
+  other: {
+    label: "Other",
+    icon: Folder,
+  },
+} as const;

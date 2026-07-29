@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-import { useEffect } from "react";
 import { useSearchParams } from "react-router";
 import type { DashboardTab } from "../types/tab";
 

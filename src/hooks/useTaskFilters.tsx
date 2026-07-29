@@ -4,7 +4,7 @@ export function useTaskFilters() {
     const [searchParams, setSearchParams] = useSearchParams();
 
 
-    const updateParam = (key: string, value: string) => {
+    const updateParam = (key: string, value?: string) => {
         setSearchParams(prev => {
             const params = new URLSearchParams(prev);
 
@@ -24,18 +24,18 @@ export function useTaskFilters() {
         priority: searchParams.get("priority") ?? "",
         recurrence: searchParams.get("recurrence") ?? "",
         category: searchParams.get("category") ?? "",
-        
 
-        setTab: (value: string) =>
+
+        setTab: (value?: string) =>
             updateParam("tab", value),
 
-        setPriority: (value: string) =>
+        setPriority: (value?: string) =>
             updateParam("priority", value),
 
-        setRecurrence: (value: string) =>
+        setRecurrence: (value?: string) =>
             updateParam("recurrence", value),
 
-        setCategory: (value: string) =>
+        setCategory: (value?: string) =>
             updateParam("category", value),
     };
 }

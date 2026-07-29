@@ -1,18 +1,12 @@
 import { FilterSelect } from "@/components/tasks/FilterSelect";
 import { RECURRENCE_OPTIONS, TASK_CATEGORIES, TASK_PRIORITIES } from "@/constants/tasks";
 import { useTaskFilters } from "@/hooks/useTaskFilters";
-import { Calendar, Flag, Folder, Repeat } from "lucide-react";
+import { Flag, Folder, Repeat } from "lucide-react";
 
 export function FiltersTasks() {
     const { priority, recurrence, category, setPriority, setRecurrence, setCategory } = useTaskFilters()
     return (
         <div className="flex gap-6">
-            {/* <FilterSelect
-                icon={<Calendar size={18} className="text-primary" />}
-                placeholder="Date"
-                options={{}}
-            /> */}
-
             <FilterSelect
                 icon={<Flag size={18} className="text-primary" />}
                 placeholder="Priority"

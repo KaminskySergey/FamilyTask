@@ -31,8 +31,11 @@ export async function getTasks({
   recurrence,
   search,
 }: TaskFilters): Promise<ITask[]> {
-  const skipOnetime = !!recurrence;
-  console.log("skipOnetime =", skipOnetime);
+  const isOnetimeOnly = recurrence === "none";
+  const isRecurringFilter = !!recurrence && recurrence !== "none";
+
+  const includeOnetime = !isRecurringFilter;
+  const includeRecurring = !isOnetimeOnly;
 
   let onetimeQuery = supabase
     .from("tasks")
@@ -61,7 +64,7 @@ export async function getTasks({
     recurringQuery = recurringQuery.eq("category", category);
   }
 
-  if (recurrence) {
+  if (isRecurringFilter) {
     recurringQuery = recurringQuery.eq("recurrence", recurrence);
   }
 
@@ -90,7 +93,7 @@ export async function getTasks({
 
     onetimeQuery = onetimeQuery.gte("deadline", from).lte("deadline", to);
 
-    if (!recurrence) {
+    if (!isRecurringFilter) {
       recurringQuery = recurringQuery.or(
         [
           "recurrence.eq.daily",
@@ -113,10 +116,12 @@ export async function getTasks({
     { data: onetime, error: oneTimeError },
     { data: recurring, error: recurringError },
   ] = await Promise.all([
-    skipOnetime
-      ? Promise.resolve({ data: [] as ITask[], error: null })
-      : onetimeQuery,
-    recurringQuery,
+    includeOnetime
+      ? onetimeQuery
+      : Promise.resolve({ data: [] as ITask[], error: null }),
+    includeRecurring
+      ? recurringQuery
+      : Promise.resolve({ data: [] as ITask[], error: null }),
   ]);
 
   if (oneTimeError) {

@@ -102,7 +102,7 @@ export function TaskCard({
                 {task.priority && (
                     <span
                         className={cn(
-                            "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                            "px-2 py-0.5 rounded-full body font-bold uppercase tracking-wider",
                             {
                                 "bg-blue-bg text-blue": task.priority === "low",
                                 "bg-primary-light text-primary": task.priority === "normal",

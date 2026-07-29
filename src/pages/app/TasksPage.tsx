@@ -25,7 +25,7 @@ export default function TasksPage() {
         recurrence: searchParams.get("recurrence") ?? undefined,
     };
 
-    const { data: tasks, isLoading: isLoadingTask } = useTasks(filters);
+    const { data: tasks = [], isLoading: isLoadingTask } = useTasks(filters);
 
     if (!user) {
         return <Navigate to="/login" />;

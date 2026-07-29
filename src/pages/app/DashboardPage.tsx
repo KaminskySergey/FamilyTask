@@ -38,7 +38,7 @@ export default function DashboardPage() {
         return <Navigate to="/setup" replace />;
     }
 
-
+console.log(tasks)
     const mode = tab === "personal"
         ? "personal"
         : "family";
