@@ -61,11 +61,9 @@ export function TaskCard({
             });
 
         } else {
-
             complete({
                 taskId: task.id,
                 userId: user.id,
-                familyId: task.family_id,
                 xpEarned: task.xp_reward,
                 recurringDate,
             });

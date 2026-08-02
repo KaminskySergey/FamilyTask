@@ -1,175 +1,57 @@
-import { format, getDay, getDate, parseISO } from "date-fns";
-import type { CreateTaskParams, ITask, TaskFilters } from "../types/task";
+import type {
+  CreateTaskParams,
+  ITask,
+  TaskFilters,
+} from "../types/task";
 import { supabase } from "../lib/supabase";
 
-const PROFILE_SELECT = `
-  id,
-  email,
-  name,
-  avatar_emoji,
-  avatar_url,
-  role,
-  xp,
-  streak,
-  created_at
-`;
 
-const TASK_SELECT = `
-  *,
-  completions:task_completions(*),
-  assignee:profiles!tasks_assigned_to_fkey (${PROFILE_SELECT}),
-  creator:profiles!tasks_created_by_fkey (${PROFILE_SELECT})
-`;
-
-export async function getTasks({
-  familyId,
-  userId,
-  date,
-  tab,
-  priority,
-  category,
-  recurrence,
-  search,
-}: TaskFilters): Promise<ITask[]> {
-  const isOnetimeOnly = recurrence === "none";
-  const isRecurringFilter = !!recurrence && recurrence !== "none";
-
-  const includeOnetime = !isRecurringFilter;
-  const includeRecurring = !isOnetimeOnly;
-
-  let onetimeQuery = supabase
-    .from("tasks")
-    .select(TASK_SELECT)
-    .eq("family_id", familyId)
-    .eq("is_recurring", false);
-
-  let recurringQuery = supabase
-    .from("tasks")
-    .select(TASK_SELECT)
-    .eq("family_id", familyId)
-    .eq("is_recurring", true);
-
-  if (userId) {
-    onetimeQuery = onetimeQuery.eq("assigned_to", userId);
-    recurringQuery = recurringQuery.eq("assigned_to", userId);
+export async function getTasks(
+  filters: TaskFilters & {
+    limit?: number;
+    offset?: number;
   }
+) {
+  const [tasksResult, countResult] = await Promise.all([
+    supabase.rpc("get_tasks", {
+      p_family_id: filters.familyId,
+      p_user_id: filters.userId ?? null,
+      p_date: filters.date ?? null,
+      p_tab: filters.tab ?? null,
+      p_priority: filters.priority ?? null,
+      p_category: filters.category ?? null,
+      p_recurrence: filters.recurrence ?? null,
+      p_search: filters.search ?? null,
+      p_limit: filters.limit ?? 20,
+      p_offset: filters.offset ?? 0,
+    }),
 
-  if (priority) {
-    onetimeQuery = onetimeQuery.eq("priority", priority);
-    recurringQuery = recurringQuery.eq("priority", priority);
-  }
-
-  if (category) {
-    onetimeQuery = onetimeQuery.eq("category", category);
-    recurringQuery = recurringQuery.eq("category", category);
-  }
-
-  if (isRecurringFilter) {
-    recurringQuery = recurringQuery.eq("recurrence", recurrence);
-  }
-
-  if (search) {
-    onetimeQuery = onetimeQuery.ilike("title", `%${search}%`);
-    recurringQuery = recurringQuery.ilike("title", `%${search}%`);
-  }
-
-  if (tab === "completed") {
-    onetimeQuery = onetimeQuery.eq("status", "DONE");
-    recurringQuery = recurringQuery.eq("status", "DONE");
-  }
-
-  if (tab === "open") {
-    onetimeQuery = onetimeQuery.neq("status", "DONE");
-    recurringQuery = recurringQuery.neq("status", "DONE");
-  }
-
-  if (date) {
-    const parsedDate = parseISO(date);
-    const from = `${date}T00:00:00`;
-    const to = `${date}T23:59:59`;
-
-    const dayOfWeek = getDay(parsedDate);
-    const dayOfMonth = getDate(parsedDate);
-
-    onetimeQuery = onetimeQuery.gte("deadline", from).lte("deadline", to);
-
-    if (!isRecurringFilter) {
-      recurringQuery = recurringQuery.or(
-        [
-          "recurrence.eq.daily",
-          `and(recurrence.eq.weekly,recurrence_days.cs.{${dayOfWeek}})`,
-          `and(recurrence.eq.monthly,recurrence_days.cs.{${dayOfMonth}})`,
-        ].join(",")
-      );
-    } else if (recurrence === "weekly") {
-      recurringQuery = recurringQuery.contains("recurrence_days", [dayOfWeek]);
-    } else if (recurrence === "monthly") {
-      recurringQuery = recurringQuery.contains("recurrence_days", [dayOfMonth]);
-    }
-
-    recurringQuery = recurringQuery.or(
-      `recurrence_end_date.is.null,recurrence_end_date.gte.${from}`
-    );
-  }
-
-  const [
-    { data: onetime, error: oneTimeError },
-    { data: recurring, error: recurringError },
-  ] = await Promise.all([
-    includeOnetime
-      ? onetimeQuery
-      : Promise.resolve({ data: [] as ITask[], error: null }),
-    includeRecurring
-      ? recurringQuery
-      : Promise.resolve({ data: [] as ITask[], error: null }),
+    supabase.rpc("get_tasks_count", {
+      p_family_id: filters.familyId,
+      p_user_id: filters.userId ?? null,
+      p_date: filters.date ?? null,
+      p_tab: filters.tab ?? null,
+      p_priority: filters.priority ?? null,
+      p_category: filters.category ?? null,
+      p_recurrence: filters.recurrence ?? null,
+      p_search: filters.search ?? null,
+    }),
   ]);
 
-  if (oneTimeError) {
-    throw new Error(oneTimeError.message);
+  if (tasksResult.error) {
+    throw new Error(tasksResult.error.message);
   }
 
-  if (recurringError) {
-    throw new Error(recurringError.message);
+  if (countResult.error) {
+    throw new Error(countResult.error.message);
   }
 
-  return [...(onetime ?? []), ...(recurring ?? [])] as ITask[];
+  return {
+    items: tasksResult.data as ITask[],
+    total: Number(countResult.data),
+  };
 }
 
-export async function getMyTodayTasks(userId: string): Promise<ITask[]> {
-  const todayStr = format(new Date(), "yyyy-MM-dd");
-  const from = `${todayStr}T00:00:00`;
-  const to = `${todayStr}T23:59:59`;
-  const dayOfWeek = getDay(new Date());
-  const dayOfMonth = getDate(new Date());
-  const [{ data: onetime, error: e1 }, { data: recurring, error: e2 }] =
-    await Promise.all([
-      supabase
-        .from("tasks")
-        .select(TASK_SELECT)
-        .eq("assigned_to", userId)
-        .eq("is_recurring", false)
-        .neq("status", "DONE")
-        .gte("deadline", from)
-        .lte("deadline", to)
-        .order("deadline", { ascending: true }),
-
-      supabase
-        .from("tasks")
-        .select(TASK_SELECT)
-        .eq("assigned_to", userId)
-        .eq("is_recurring", true)
-        .or(
-          `recurrence.eq.daily,` +
-            `and(recurrence.eq.weekly,recurrence_days.cs.{${dayOfWeek}}),` +
-            `and(recurrence.eq.monthly,recurrence_days.cs.{${dayOfMonth}})`
-        )
-        .or(`recurrence_end_date.is.null,recurrence_end_date.gte.${from}`),
-    ]);
-  if (e1) throw new Error(e1.message);
-  if (e2) throw new Error(e2.message);
-
-  return [...(onetime ?? []), ...(recurring ?? [])] as unknown as ITask[];
-}
 export async function getCompletedTasksCount(userId: string): Promise<number> {
   const { count, error } = await supabase
     .from("task_completions")

@@ -25,37 +25,46 @@ export default function DashboardPage() {
     const { tab, date, setDate, setTab } = useDashboardFilters();
 
     const { data: family, isLoading: familyLoading } = useCurrentFamily(user?.id);
-    const { data: tasks, isLoading: isTasksLoading } = useTasks({ familyId: family?.family_id, date });
 
+    const { data: tasksData, isLoading: isTasksLoading } = useTasks({
+        familyId: family?.family_id,
+        date,
+    });
 
     if (!user) {
         return <Navigate to="/login" />;
     }
+
     if (familyLoading) {
         return <Loader />;
     }
+
     if (!family) {
         return <Navigate to="/setup" replace />;
     }
 
-console.log(tasks)
+    const tasks = tasksData?.items ?? [];
+
     const mode = tab === "personal"
         ? "personal"
         : "family";
 
-    const visibleTasks = useMemo(() =>
-        tab === "personal"
-            ? (tasks ?? []).filter(t => t.assigned_to === user.id)
-            : (tasks ?? []),
+    const visibleTasks = useMemo(
+        () =>
+            tab === "personal"
+                ? tasks.filter(task => task.assigned_to === user.id)
+                : tasks,
         [tab, tasks, user.id]
     );
 
-    const taskProgress = useMemo(() =>
-        tab === "family"
-            ? getFamilyTaskProgress(tasks ?? [], date)
-            : getUserTaskProgress(tasks ?? [], user.id, date),
+    const taskProgress = useMemo(
+        () =>
+            tab === "family"
+                ? getFamilyTaskProgress(tasks, date)
+                : getUserTaskProgress(tasks, user.id, date),
         [tab, tasks, date, user.id]
     );
+
     return (
         <Container className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 

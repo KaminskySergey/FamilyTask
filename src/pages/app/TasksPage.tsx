@@ -25,7 +25,7 @@ export default function TasksPage() {
         recurrence: searchParams.get("recurrence") ?? undefined,
     };
 
-    const { data: tasks = [], isLoading: isLoadingTask } = useTasks(filters);
+    const { data: tasks, isLoading: isLoadingTask } = useTasks(filters);
 
     if (!user) {
         return <Navigate to="/login" />;
@@ -36,7 +36,6 @@ export default function TasksPage() {
     if (!family) {
         return <Navigate to="/setup" replace />;
     }
-    console.log(tasks)
     return (
         <Container className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <section className="lg:col-span-12">
@@ -50,7 +49,7 @@ export default function TasksPage() {
                 <FiltersTasks />
             </section>
             <section className="lg:col-span-12">
-                 <TasksList tasks={tasks} loading={isLoadingTask}/>
+                 <TasksList tasks={tasks?.items ?? []} loading={isLoadingTask}/>
             </section>
         </Container>
     )

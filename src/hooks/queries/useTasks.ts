@@ -3,7 +3,6 @@ import {
   createTaskService,
   deleteTask,
   getCompletedTasksCount,
-  getMyTodayTasks,
   getTasks,
   uncompleteTask,
 } from "../../services/task-service";
@@ -20,15 +19,6 @@ export function useTasks(filters: TaskFilters) {
   });
 }
 
-
-export function useMyTodayTasks(userId?: string) {
-  return useQuery({
-    queryKey: ["tasks", "today", userId],
-    queryFn: () => getMyTodayTasks(userId!),
-    enabled: !!userId,
-  });
-}
-
 export function useCreateTask() {
   const queryClient = useQueryClient();
 
@@ -41,54 +31,147 @@ export function useCreateTask() {
   });
 }
 
+interface CompleteTaskVariables {
+  taskId: string;
+  userId: string;
+  xpEarned: number;
+  recurringDate?: string;
+}
+
+interface UncompleteTaskVariables {
+  taskId: string;
+  userId: string;
+  familyId: string;
+  recurringDate?: string;
+}
+
 export function useCompleteTask() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       taskId,
       userId,
       xpEarned,
       recurringDate,
-    }: {
-      taskId: string;
-      userId: string;
-      xpEarned: number;
-      familyId: string;
-      recurringDate?: string;
-    }) => completeTask(taskId, userId, xpEarned, recurringDate),
-    onSuccess: (_data, variables) => {
+    }: CompleteTaskVariables) =>
+      completeTask(taskId, userId, xpEarned, recurringDate),
+
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: ["tasks"] });
+
+      const previousQueries = queryClient.getQueriesData({
+        queryKey: ["tasks"],
+      });
+
+      queryClient.setQueriesData({ queryKey: ["tasks"] }, (old: any) => {
+        if (!old || !Array.isArray(old.items)) return old;
+
+        return {
+          ...old,
+          items: old.items.map((task: any) => {
+            if (task.id !== variables.taskId) return task;
+
+            if (task.is_recurring) {
+              return {
+                ...task,
+                completions: [
+                  ...(task.completions || []),
+                  {
+                    task_id: task.id,
+                    user_id: variables.userId,
+                    xp_earned: variables.xpEarned,
+                    recurring_date: variables.recurringDate,
+                  },
+                ],
+              };
+            }
+
+            return { ...task, status: "DONE" };
+          }),
+        };
+      });
+
+      return { previousQueries };
+    },
+
+    onError: (_err, _variables, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, previousData]) => {
+          queryClient.setQueryData(queryKey, previousData);
+        });
+      }
+    },
+
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({
-        queryKey: ["leaderboard", variables.familyId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["profile", variables.userId],
-      });
     },
   });
 }
 
+
 export function useUncompleteTask() {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      taskId,
-      userId,
-      recurringDate,
-    }: {
-      taskId: string;
-      userId: string;
-      familyId: string;
-      recurringDate?: string;
-    }) => uncompleteTask(taskId, userId, recurringDate),
-    onSuccess: (_data, variables) => {
+    mutationFn: ({ taskId, userId, recurringDate }: UncompleteTaskVariables) =>
+      uncompleteTask(taskId, userId, recurringDate),
+
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: ["tasks"] });
+
+      const previousQueries = queryClient.getQueriesData({
+        queryKey: ["tasks"],
+      });
+
+      queryClient.setQueriesData({ queryKey: ["tasks"] }, (old: any) => {
+        if (!old || !Array.isArray(old.items)) return old;
+
+        return {
+          ...old,
+          items: old.items.map((task: any) => {
+            if (task.id !== variables.taskId) return task;
+
+            if (task.is_recurring) {
+              return {
+                ...task,
+                completions: (task.completions || []).filter(
+                  (c: any) =>
+                    !(
+                      c.user_id === variables.userId &&
+                      c.recurring_date === variables.recurringDate
+                    )
+                ),
+              };
+            }
+
+            return { ...task, status: "IN_PROGRESS" };
+          }),
+        };
+      });
+
+      return { previousQueries };
+    },
+
+    onError: (_err, _variables, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, previousData]) => {
+          queryClient.setQueryData(queryKey, previousData);
+        });
+      }
+    },
+
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({
-        queryKey: ["leaderboard", variables.familyId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["profile", variables.userId],
-      });
+
+      if (variables) {
+        queryClient.invalidateQueries({
+          queryKey: ["leaderboard", variables.familyId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["profile", variables.userId],
+        });
+      }
     },
   });
 }

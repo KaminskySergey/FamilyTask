@@ -21,6 +21,11 @@ export interface ITaskCompletion {
   recurring_date: string | null;
 }
 
+export type TasksResponse = {
+  items: ITask[];
+  total: number;
+};
+
 export interface ITask {
   id: string;
   title: string;
